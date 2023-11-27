@@ -11,7 +11,7 @@ class Firework {
     this.y = y;
     this.targetY = targetY;
     this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
-    this.velocity = -Math.random() * 3 - 4;
+    this.velocity = -Math.random() * 2 - 2;
   }
 
   update() {
@@ -42,18 +42,18 @@ class Particle {
     this.color = color;
     this.radius = Math.random() * 2 + 1;
     this.velocity = {
-      x: (Math.random() - 0.5) * 8, // Wider horizontal spread
-      y: (Math.random() - 0.5) * 8, // Reduced vertical initial velocity
+      x: (Math.random() - 0.5) * 6, // Slower horizontal spread
+      y: (Math.random() - 0.5) * 6, // Slower vertical initial velocity
     };
     this.gravity = 0.1; // Gravity pulling particles down
     this.alpha = 1;
   }
 
   update() {
-    this.velocity.y += this.gravity; // Apply gravity
+    this.velocity.y += this.gravity;
     this.x += this.velocity.x;
     this.y += this.velocity.y;
-    this.alpha -= 0.01; // Fade out effect
+    this.alpha -= 0.01;
   }
 
   draw() {
