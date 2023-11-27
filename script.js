@@ -42,16 +42,18 @@ class Particle {
     this.color = color;
     this.radius = Math.random() * 2 + 1;
     this.velocity = {
-      x: Math.random() - 0.5,
-      y: Math.random() - 0.5,
+      x: (Math.random() - 0.5) * 8, // Wider horizontal spread
+      y: (Math.random() - 0.5) * 8, // Reduced vertical initial velocity
     };
+    this.gravity = 0.1; // Gravity pulling particles down
     this.alpha = 1;
   }
 
   update() {
+    this.velocity.y += this.gravity; // Apply gravity
     this.x += this.velocity.x;
     this.y += this.velocity.y;
-    this.alpha -= 0.01;
+    this.alpha -= 0.01; // Fade out effect
   }
 
   draw() {
