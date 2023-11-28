@@ -5,11 +5,6 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
-
 class Firework {
   constructor(x, y, targetY) {
     this.x = x;
@@ -99,14 +94,6 @@ let delta;
 
 function animate() {
   requestAnimationFrame(animate);
-  // now = Date.now();
-  // delta = now - then;
-  // if (delta > interval) {
-  //   then = now - (delta % interval);
-  //   ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-  //   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  // }
-
   ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -147,4 +134,24 @@ function animate() {
   }
 }
 
+function drawStarryBackground() {
+  const starCount = (canvas.width + canvas.height) / 2; // Adjust the number of stars based on canvas size
+
+  ctx.fillStyle = "white";
+  for (let i = 0; i < starCount; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const radius = Math.random() * 1.5; // Random radius for stars
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+drawStarryBackground();
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  drawStarryBackground();
+});
 animate();
