@@ -168,13 +168,19 @@ class Particle {
     };
     this.gravity = 0.1;
     this.alpha = 1;
+    this.lifetime = 0;
   }
 
   update() {
     this.velocity.y += this.gravity;
     this.x += this.velocity.x;
     this.y += this.velocity.y;
-    this.alpha -= 0.01;
+    // this.alpha -= 0.01;
+    this.lifetime += 1;
+    this.alpha = Math.exp(-0.05 * this.lifetime);
+    if (this.alpha <= 0.01) {
+      this.alpha = 0;
+    }
   }
 
   draw() {
@@ -203,7 +209,7 @@ let particles = [];
 const maxFireworks = 4;
 
 const explosionSounds = [];
-const maxSounds = 5;
+const maxSounds = 10;
 
 for (let i = 0; i < maxSounds; i++) {
   explosionSounds.push(new Audio("./boom.mp3"));
@@ -213,7 +219,7 @@ function playExplosionSound() {
   const sound = explosionSounds.pop();
   if (sound) {
     sound.play();
-    explosionSounds.unshift(sound); // Add it back to the start of the array
+    explosionSounds.unshift(sound);
   }
 }
 
@@ -237,6 +243,8 @@ function launchFirework() {
 
 function animate() {
   requestAnimationFrame(animate);
+  // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
