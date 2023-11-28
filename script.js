@@ -50,7 +50,7 @@ class Firework {
 
   explode() {
     this.exploded = true; // Set the flag when exploded
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 30; i++) {
       particles.push(new Particle(this.x, this.y, this.color));
     }
   }
