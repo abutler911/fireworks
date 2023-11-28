@@ -35,6 +35,7 @@ class Firework {
 
   explode() {
     this.exploded = true;
+    playExplosionSound();
     for (let i = 0; i < 30; i++) {
       particles.push(new Particle(this.x, this.y, this.color, this.ctx));
     }
@@ -81,9 +82,27 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+const explosionSound = new Audio("./boom.mp3");
+explosionSound.preload = "auto";
+
 let fireworks = [];
 let particles = [];
 const maxFireworks = 4;
+
+const explosionSounds = [];
+const maxSounds = 5;
+
+for (let i = 0; i < maxSounds; i++) {
+  explosionSounds.push(new Audio("./boom.mp3"));
+}
+
+function playExplosionSound() {
+  const sound = explosionSounds.pop();
+  if (sound) {
+    sound.play();
+    explosionSounds.unshift(sound); // Add it back to the start of the array
+  }
+}
 
 function launchFirework() {
   const x = Math.random() * canvas.width;
@@ -141,7 +160,10 @@ function drawStarryBackground() {
 }
 
 const launchButton = document.getElementById("launchButton");
-launchButton.addEventListener("click", launchFirework);
+launchButton.addEventListener("click", () => {
+  launchFirework();
+  playExplosionSound(); // Test sound here
+});
 
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
