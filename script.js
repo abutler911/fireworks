@@ -5,8 +5,8 @@ class Firework {
     this.targetY = targetY;
     this.ctx = ctx;
     this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
-    this.velocity = { x: (Math.random() - 0.5) * 1, y: -Math.random() * 2 - 2 };
-    this.gravity = 0.02;
+    this.velocity = { x: (Math.random() - 0.5) * 1, y: -Math.random() * 4 - 4 };
+    this.gravity = 0.009;
     this.exploded = false;
     this.angle = 0;
     this.spiralAmount = Math.random() * 0.1 - 0.7;
@@ -37,7 +37,7 @@ class Firework {
     this.exploded = true;
     playExplosionSound();
 
-    const explosionType = Math.floor(Math.random() * 7); // Randomly select explosion type
+    const explosionType = Math.floor(Math.random() * 6);
 
     switch (explosionType) {
       case 0:
@@ -50,15 +50,12 @@ class Firework {
         this.starburstExplosion();
         break;
       case 3:
-        this.heartExplosion();
-        break;
-      case 4:
         this.spiralExplosion();
         break;
-      case 5:
+      case 4:
         this.randomBurstExplosion();
         break;
-      case 6:
+      case 5:
         this.flowerExplosion();
         break;
       default:
@@ -107,31 +104,12 @@ class Firework {
     }
   }
 
-  heartExplosion() {
-    const numParticles = 100; // Increased number for a fuller heart shape
-    for (let i = 0; i < numParticles; i++) {
-      const angle = Math.PI * (i / numParticles); // Range from 0 to π
-      const x = 16 * Math.pow(Math.sin(angle), 3);
-      const y = -(
-        13 * Math.cos(angle) -
-        5 * Math.cos(2 * angle) -
-        2 * Math.cos(3 * angle) -
-        Math.cos(4 * angle)
-      );
-      const scale = 0.1; // Scale factor to adjust the size
-      const velocity = { x: x * scale, y: y * scale };
-      particles.push(
-        new Particle(this.x, this.y, this.color, this.ctx, velocity)
-      );
-    }
-  }
-
   spiralExplosion() {
     const numParticles = 100;
     const spirals = 3;
     for (let i = 0; i < numParticles; i++) {
       const angle = spirals * Math.PI * (i / numParticles);
-      const radius = (i / numParticles) * 10;
+      const radius = (i / numParticles) * 4;
       const velocity = {
         x: Math.cos(angle) * radius,
         y: Math.sin(angle) * radius,
@@ -241,7 +219,16 @@ function playExplosionSound() {
 
 function launchFirework() {
   const x = Math.random() * canvas.width;
-  const targetY = 2;
+  const targetY = Math.random() * (canvas.height / 6) + canvas.height / 12;
+
+  console.log(
+    "Launching firework - x:",
+    x,
+    "targetY:",
+    targetY,
+    "canvas height:",
+    canvas.height
+  );
 
   // const targetY =
   //   Math.random() * (canvas.height / 4 - canvas.height / 8) + canvas.height / 8;
@@ -281,19 +268,6 @@ function animate() {
       particles.splice(index, 1);
     }
   });
-}
-
-function drawStarryBackground() {
-  const starCount = (canvas.width + canvas.height) / 2;
-  ctx.fillStyle = "white";
-  for (let i = 0; i < starCount; i++) {
-    const x = Math.random() * canvas.width;
-    const y = Math.random() * canvas.height;
-    const radius = Math.random() * 1.5;
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fill();
-  }
 }
 
 const launchButton = document.getElementById("launchButton");
