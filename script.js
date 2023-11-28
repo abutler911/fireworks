@@ -5,6 +5,11 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
 class Firework {
   constructor(x, y, targetY) {
     this.x = x;
@@ -45,7 +50,7 @@ class Firework {
 
   explode() {
     this.exploded = true; // Set the flag when exploded
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 15; i++) {
       particles.push(new Particle(this.x, this.y, this.color));
     }
   }
@@ -85,10 +90,23 @@ class Particle {
 
 let fireworks = [];
 let particles = [];
-let maxFireworks = 6;
+let maxFireworks = 4;
+let fps = 30;
+let now;
+let then = Date.now();
+let interval = 1000 / fps;
+let delta;
 
 function animate() {
   requestAnimationFrame(animate);
+  now = Date.now();
+  delta = now - then;
+  if (delta > interval) {
+    then = now - (delta % interval);
+    ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
   ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
