@@ -17,7 +17,7 @@ class Firework {
     this.targetY = targetY;
     this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
     this.velocity = {
-      x: (Math.random() - 0.5) * 4, // Random horizontal velocity
+      x: (Math.random() - 0.5) * 1, // Random horizontal velocity
       y: -Math.random() * 2 - 2, // Vertical velocity
     };
     this.gravity = 0.02; // Gravity factor
