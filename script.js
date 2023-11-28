@@ -99,13 +99,13 @@ let delta;
 
 function animate() {
   requestAnimationFrame(animate);
-  now = Date.now();
-  delta = now - then;
-  if (delta > interval) {
-    then = now - (delta % interval);
-    ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }
+  // now = Date.now();
+  // delta = now - then;
+  // if (delta > interval) {
+  //   then = now - (delta % interval);
+  //   ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+  //   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // }
 
   ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -117,13 +117,12 @@ function animate() {
     for (let j = 0; j < newFireworksCount; j++) {
       const x = Math.random() * canvas.width;
 
-      // Adjust targetY to ensure fireworks explode higher
-      // Set a minimum height at 2/3 of the screen
-      const minHeight = canvas.height * (2 / 3);
-      // Randomness up to an additional 1/12 of the screen height
-      const randomHeight = Math.random() * (canvas.height / 12);
-
-      const targetY = minHeight - randomHeight;
+      // Calculate targetY to be between 2/3 to 3/4 of the screen height
+      const targetYRangeStart = (canvas.height * 1) / 4;
+      const targetYRangeEnd = (canvas.height * 1) / 3;
+      const targetY =
+        targetYRangeStart +
+        Math.random() * (targetYRangeEnd - targetYRangeStart);
 
       fireworks.push(new Firework(x, canvas.height, targetY));
     }
