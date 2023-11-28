@@ -117,9 +117,9 @@ function animate() {
     for (let j = 0; j < newFireworksCount; j++) {
       const x = Math.random() * canvas.width;
 
-      // Adjust targetY to be lower (higher on the screen)
-      // Ensure it doesn't go below a certain limit (e.g., 1/4 of the screen height)
-      const targetY = Math.random() * (canvas.height / 1);
+      const minHeight = canvas.height / 3;
+      const maxHeight = canvas.height / 4;
+      const targetY = minHeight + Math.random() * maxHeight;
 
       fireworks.push(new Firework(x, canvas.height, targetY));
     }
