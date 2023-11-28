@@ -8,9 +8,14 @@ class Firework {
     this.velocity = { x: (Math.random() - 0.5) * 1, y: -Math.random() * 2 - 2 };
     this.gravity = 0.02;
     this.exploded = false;
+    this.angle = 0;
+    this.spiralAmount = Math.random() * 0.1 - 0.7;
   }
 
   update() {
+    this.angle += this.spiralAmount;
+    this.velocity.x += Math.cos(this.angle) * 0.2;
+
     if (this.velocity.y < 0) {
       this.velocity.y += this.gravity;
     }
@@ -80,6 +85,13 @@ let fireworks = [];
 let particles = [];
 const maxFireworks = 4;
 
+function launchFirework() {
+  const x = Math.random() * canvas.width;
+  const targetY =
+    canvas.height / 4 + Math.random() * (canvas.height / 3 - canvas.height / 4);
+  fireworks.push(new Firework(x, canvas.height, targetY, ctx));
+}
+
 function animate() {
   requestAnimationFrame(animate);
   ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
@@ -128,10 +140,11 @@ function drawStarryBackground() {
   }
 }
 
-drawStarryBackground();
+const launchButton = document.getElementById("launchButton");
+launchButton.addEventListener("click", launchFirework);
+
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  drawStarryBackground();
 });
 animate();
