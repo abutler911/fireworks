@@ -182,6 +182,27 @@ class Firework {
   }
 }
 
+class CometFirework extends Firework {
+  constructor(x, y, targetY, ctx) {
+    super(x, y, targetY, ctx);
+    this.color = "white"; // Specific color for the comet
+  }
+
+  draw() {
+    this.ctx.fillStyle = this.color;
+    this.ctx.beginPath();
+    this.ctx.arc(this.x, this.y, 4, 0, Math.PI * 4);
+    this.ctx.fill();
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.x, this.y);
+    this.ctx.lineTo(this.x - this.velocity.x * 4, this.y - this.velocity.y * 4);
+    this.ctx.strokeStyle = this.color;
+    this.ctx.lineWidth = 2;
+    this.ctx.stroke();
+  }
+}
+
 class Particle {
   constructor(x, y, color, ctx, velocity, radius = null) {
     this.x = x;
@@ -286,7 +307,7 @@ let particles = [];
 const maxFireworks = 4;
 
 const explosionSounds = [];
-const maxSounds = 20;
+const maxSounds = 25;
 
 for (let i = 0; i < maxSounds; i++) {
   explosionSounds.push(new Audio("./boom.mp3"));
@@ -343,6 +364,17 @@ function animate(timestamp) {
 
   ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Randomly decide to launch a comet from one of the cannons
+  if (Math.random() < 0.002) {
+    // Adjust this probability to control frequency
+    const randomCannonIndex = Math.floor(Math.random() * cannons.length);
+    const cannon = cannons[randomCannonIndex];
+    const targetY = Math.random() * (canvas.height / 6) + canvas.height / 12;
+
+    fireworks.push(new CometFirework(cannon.x, canvas.height, targetY, ctx));
+    cannon.isFiring = true;
+  }
 
   fireworks.forEach((firework, index) => {
     firework.update();
