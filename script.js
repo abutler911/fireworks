@@ -6,7 +6,7 @@ class Firework {
     this.ctx = ctx;
     this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
     this.velocity = { x: (Math.random() - 0.5) * 1, y: -Math.random() * 4 - 4 };
-    this.gravity = 0.03;
+    this.gravity = 0.035;
     this.exploded = false;
     this.angle = 0;
     this.spiralAmount = Math.random() * 0.1 - 0.6;
@@ -244,14 +244,18 @@ function launchFirework() {
     canvas.height
   );
 
-  // const targetY =
-  //   Math.random() * (canvas.height / 4 - canvas.height / 8) + canvas.height / 8;
   fireworks.push(new Firework(x, canvas.height, targetY, ctx));
 }
 
-function animate() {
+let lastTime = 0;
+
+function animate(timestamp) {
   requestAnimationFrame(animate);
-  // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const deltaTime = timestamp - lastTime;
+  lastTime = timestamp;
+
+  const movement = (100 * deltaTime) / 1000;
 
   ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
