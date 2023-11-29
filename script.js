@@ -45,7 +45,7 @@ class Firework {
     this.exploded = true;
     playExplosionSound();
 
-    const explosionType = Math.floor(Math.random() * 6);
+    const explosionType = Math.floor(Math.random() * 7);
 
     switch (explosionType) {
       case 0:
@@ -65,6 +65,9 @@ class Firework {
         break;
       case 5:
         this.flowerExplosion();
+        break;
+      case 6:
+        this.ringExplosion();
         break;
       default:
         this.circularExplosion();
@@ -161,6 +164,22 @@ class Firework {
       }
     }
   }
+
+  ringExplosion() {
+    const numParticles = 50; // Number of particles in the ring
+    const ringRadius = 5; // The initial radius of the ring
+
+    for (let i = 0; i < numParticles; i++) {
+      const angle = (i / numParticles) * Math.PI * 2;
+      const velocity = {
+        x: Math.cos(angle) * ringRadius,
+        y: Math.sin(angle) * ringRadius,
+      };
+      particles.push(
+        new Particle(this.x, this.y, this.color, this.ctx, velocity)
+      );
+    }
+  }
 }
 
 class Particle {
@@ -202,6 +221,44 @@ class Particle {
   }
 }
 
+class Cannon {
+  constructor(x, ctx) {
+    this.x = x;
+    this.y = canvas.height - 30;
+    this.ctx = ctx;
+    this.isFiring = false;
+  }
+
+  draw() {
+    this.ctx.fillStyle = "gray";
+    this.ctx.fillRect(this.x - 10, canvas.height - 30, 20, 30);
+
+    // Draw cannon barrel
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.x - 5, this.y);
+    this.ctx.lineTo(this.x - 5, this.y - 20);
+    this.ctx.lineTo(this.x + 5, this.y - 20);
+    this.ctx.lineTo(this.x + 5, this.y);
+    this.ctx.closePath();
+    this.ctx.fill();
+
+    // Draw fire effect if the cannon is firing
+    if (this.isFiring) {
+      this.ctx.fillStyle = "orange";
+      this.ctx.beginPath();
+      this.ctx.arc(this.x, this.y - 25, 10, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.isFiring = false;
+    }
+  }
+
+  launchFirework() {
+    const targetY = Math.random() * (canvas.height / 6) + canvas.height / 12;
+    fireworks.push(new Firework(this.x, this.y, targetY, this.ctx));
+    this.isFiring = true;
+  }
+}
+
 const container = document.getElementById("fireworksContainer");
 const canvas = document.createElement("canvas");
 container.appendChild(canvas);
@@ -217,12 +274,19 @@ let particles = [];
 const maxFireworks = 4;
 
 const explosionSounds = [];
-const maxSounds = 10;
+const maxSounds = 20;
 
 for (let i = 0; i < maxSounds; i++) {
   explosionSounds.push(new Audio("./boom.mp3"));
 }
 
+const numCannons = 6;
+const cannons = [];
+
+for (let i = 0; i < numCannons; i++) {
+  const xPosition = (canvas.width / (numCannons + 1)) * (i + 1);
+  cannons.push(new Cannon(xPosition, ctx));
+}
 function playExplosionSound() {
   const sound = explosionSounds.pop();
   if (sound) {
@@ -260,18 +324,18 @@ function animate(timestamp) {
   ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  if (Math.random() < 0.02 && fireworks.length < maxFireworks) {
-    const newFireworksCount = Math.floor(
-      Math.random() * (maxFireworks - fireworks.length + 1)
-    );
-    for (let j = 0; j < newFireworksCount; j++) {
-      const x = Math.random() * canvas.width;
-      const targetY =
-        canvas.height / 4 +
-        Math.random() * (canvas.height / 3 - canvas.height / 4);
-      fireworks.push(new Firework(x, canvas.height, targetY, ctx));
-    }
-  }
+  // if (Math.random() < 0.02 && fireworks.length < maxFireworks) {
+  //   const newFireworksCount = Math.floor(
+  //     Math.random() * (maxFireworks - fireworks.length + 1)
+  //   );
+  //   for (let j = 0; j < newFireworksCount; j++) {
+  //     const x = Math.random() * canvas.width;
+  //     const targetY =
+  //       canvas.height / 4 +
+  //       Math.random() * (canvas.height / 3 - canvas.height / 4);
+  //     fireworks.push(new Firework(x, canvas.height, targetY, ctx));
+  //   }
+  // }
 
   fireworks.forEach((firework, index) => {
     firework.update();
@@ -288,13 +352,23 @@ function animate(timestamp) {
       particles.splice(index, 1);
     }
   });
+
+  ctx.fillStyle = "brown";
+  ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+
+  cannons.forEach((cannon) => {
+    cannon.draw();
+    if (Math.random() < 0.01) {
+      cannon.launchFirework();
+    }
+  });
 }
 
-const launchButton = document.getElementById("launchButton");
-launchButton.addEventListener("click", () => {
-  launchFirework();
-  playExplosionSound(); // Test sound here
-});
+// const launchButton = document.getElementById("launchButton");
+// launchButton.addEventListener("click", () => {
+//   launchFirework();
+//   playExplosionSound();
+// });
 
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
