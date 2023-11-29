@@ -6,10 +6,10 @@ class Firework {
     this.ctx = ctx;
     this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
     this.velocity = { x: (Math.random() - 0.5) * 1, y: -Math.random() * 4 - 4 };
-    this.gravity = 0.009;
+    this.gravity = 0.03;
     this.exploded = false;
     this.angle = 0;
-    this.spiralAmount = Math.random() * 0.1 - 0.7;
+    this.spiralAmount = Math.random() * 0.1 - 0.6;
   }
 
   update() {
@@ -21,7 +21,15 @@ class Firework {
     }
     this.x += this.velocity.x;
     this.y += this.velocity.y;
-    if ((this.velocity.y >= 0 || this.y <= this.targetY) && !this.exploded) {
+
+    const isSlowingDown = this.velocity.y > 0;
+    const isAboveMinimumHeight = this.y < canvas.height - 50;
+    const isBelowTopEdge = this.y > 0;
+
+    if (
+      ((isSlowingDown && isAboveMinimumHeight) || !isBelowTopEdge) &&
+      !this.exploded
+    ) {
       this.explode();
     }
   }
