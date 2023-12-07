@@ -185,7 +185,7 @@ class Firework {
 class CometFirework extends Firework {
   constructor(x, y, targetY, ctx) {
     super(x, y, targetY, ctx);
-    this.color = "white"; // Specific color for the comet
+    this.color = "white";
   }
 
   draw() {
@@ -200,6 +200,84 @@ class CometFirework extends Firework {
     this.ctx.strokeStyle = this.color;
     this.ctx.lineWidth = 2;
     this.ctx.stroke();
+  }
+}
+
+class LetterFirework extends Firework {
+  constructor(x, y, targetY, ctx, letter) {
+    super(x, y, targetY, ctx);
+    this.letter = letter;
+  }
+
+  explode() {
+    this.exploded = true;
+    playExplosionSound();
+    if (this.letter === "B") {
+      this.createBPattern();
+    } else if (this.letter === "A") {
+      this.createAPattern();
+    }
+  }
+
+  createBPattern() {
+    const particleSpacing = 10;
+    const startX = this.x - 20;
+    const startY = this.y - 30;
+
+    for (let i = 0; i < 6; i++) {
+      particles.push(
+        new Particle(startX, startY + i * particleSpacing, this.color, this.ctx)
+      );
+    }
+
+    for (let i = 0; i < 3; i++) {
+      particles.push(
+        new Particle(
+          startX + particleSpacing,
+          startY + i * particleSpacing,
+          this.color,
+          this.ctx
+        )
+      );
+      particles.push(
+        new Particle(
+          startX + particleSpacing,
+          startY + (4 + i) * particleSpacing,
+          this.color,
+          this.ctx
+        )
+      );
+    }
+  }
+
+  createAPattern() {
+    const particleSpacing = 10;
+    const startX = this.x - 20;
+    const startY = this.y - 30;
+
+    for (let i = 0; i < 5; i++) {
+      particles.push(
+        new Particle(
+          startX + i * particleSpacing,
+          startY + i * particleSpacing,
+          this.color,
+          this.ctx
+        )
+      );
+      particles.push(
+        new Particle(
+          startX + i * particleSpacing,
+          startY - i * particleSpacing,
+          this.color,
+          this.ctx
+        )
+      );
+    }
+    for (let i = 0; i < 3; i++) {
+      particles.push(
+        new Particle(startX + i * particleSpacing, startY, this.color, this.ctx)
+      );
+    }
   }
 }
 
@@ -248,6 +326,7 @@ class Cannon {
     this.y = canvas.height - 30;
     this.ctx = ctx;
     this.isFiring = false;
+    this.flameSize = 50;
   }
 
   draw() {
@@ -263,25 +342,34 @@ class Cannon {
     this.ctx.fill();
 
     if (this.isFiring) {
-      let gradient = this.ctx.createLinearGradient(
-        this.x,
-        this.y - 30,
-        this.x,
-        this.y - 50
-      );
-      gradient.addColorStop(0, "yellow");
-      gradient.addColorStop(0.5, "orange");
-      gradient.addColorStop(1, "red");
+      this.drawFlame();
+    }
+  }
+  drawFlame() {
+    let gradient = this.ctx.createLinearGradient(
+      this.x,
+      this.y - 30,
+      this.x,
+      this.y - 30 - this.flameSize
+    );
+    gradient.addColorStop(0, "yellow");
+    gradient.addColorStop(0.5, "orange");
+    gradient.addColorStop(1, "red");
 
-      this.ctx.fillStyle = gradient;
-      this.ctx.beginPath();
-      this.ctx.moveTo(this.x - 10, this.y - 20);
-      this.ctx.lineTo(this.x, this.y - 50);
-      this.ctx.lineTo(this.x + 10, this.y - 20);
-      this.ctx.closePath();
-      this.ctx.fill();
+    this.ctx.fillStyle = gradient;
+    this.ctx.beginPath();
+    const baseWidth = 5;
+    this.ctx.moveTo(this.x - baseWidth, this.y - 20);
+    this.ctx.lineTo(this.x, this.y - 20 - this.flameSize);
+    this.ctx.lineTo(this.x + baseWidth, this.y - 20);
+    this.ctx.closePath();
 
+    this.ctx.fill();
+
+    this.flameSize -= 2;
+    if (this.flameSize <= 0) {
       this.isFiring = false;
+      this.flameSize = 0;
     }
   }
 
@@ -289,6 +377,7 @@ class Cannon {
     const targetY = Math.random() * (canvas.height / 6) + canvas.height / 12;
     fireworks.push(new Firework(this.x, this.y, targetY, this.ctx));
     this.isFiring = true;
+    this.flameSize = 50;
   }
 }
 
@@ -360,20 +449,29 @@ function animate(timestamp) {
   const deltaTime = timestamp - lastTime;
   lastTime = timestamp;
 
-  const movement = (100 * deltaTime) / 1000;
-
   ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Randomly decide to launch a comet from one of the cannons
+  // Randomly decide to launch a comet or a letter-shaped firework
   if (Math.random() < 0.002) {
-    // Adjust this probability to control frequency
+    // Probability for comet
     const randomCannonIndex = Math.floor(Math.random() * cannons.length);
     const cannon = cannons[randomCannonIndex];
     const targetY = Math.random() * (canvas.height / 6) + canvas.height / 12;
-
     fireworks.push(new CometFirework(cannon.x, canvas.height, targetY, ctx));
     cannon.isFiring = true;
+    console.log("Launched a comet firework");
+  } else if (Math.random() < 0.001) {
+    // Probability for letter-shaped firework
+    const randomCannonIndex = Math.floor(Math.random() * cannons.length);
+    const cannon = cannons[randomCannonIndex];
+    const targetY = Math.random() * (canvas.height / 6) + canvas.height / 12;
+    const letter = Math.random() < 0.5 ? "B" : "A";
+    fireworks.push(
+      new LetterFirework(cannon.x, canvas.height, targetY, ctx, letter)
+    );
+    cannon.isFiring = true;
+    console.log("Launched a letter firework: " + letter);
   }
 
   fireworks.forEach((firework, index) => {

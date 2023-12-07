@@ -8,10 +8,11 @@ html {
 }
 
 #fireworksContainer {
-  width: 100%;
-  height: 100%;
+  width: 50%;
+  height: 50%;
   position: relative;
   background-color: black;
+  /* border: 3px solid red; */
 }
 
 #launchButton {
